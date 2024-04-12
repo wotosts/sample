@@ -1,7 +1,5 @@
 package dev.wotosts.sample.feature.detail
 
-import androidx.compose.foundation.gestures.Orientation
-import androidx.compose.foundation.gestures.scrollable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
@@ -15,6 +13,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.Button
@@ -27,7 +26,6 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -86,7 +84,7 @@ fun DetailScreen(
             Button(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(bottom = 16.dp, start = 16.dp, end = 16.dp),
+                    .padding(8.dp),
                 onClick = { onClickDetail(book.url) }) {
                 Text(text = "상세 보기")
             }
@@ -111,7 +109,10 @@ fun BookDetailView(modifier: Modifier = Modifier, book: Book) {
     val scrollState = rememberScrollState()
     val typography = MaterialTheme.typography
 
-    Column(modifier.scrollable(scrollState, orientation = Orientation.Vertical)) {
+    Column(
+        modifier
+            .fillMaxSize()
+            .verticalScroll(scrollState)) {
         book.run {
             SubcomposeAsyncImage(
                 modifier = Modifier.aspectRatio(1.0f),

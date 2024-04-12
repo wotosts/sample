@@ -8,14 +8,8 @@ import androidx.activity.compose.setContent
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.browser.customtabs.CustomTabsIntent
-import androidx.lifecycle.lifecycleScope
 import dagger.hilt.android.AndroidEntryPoint
-import dev.wotosts.sample.R
-import dev.wotosts.sample.databinding.ActivityDetailBinding
-import dev.wotosts.sample.feature.base.BaseActivity
 import dev.wotosts.sample.feature.ui.BookAppTheme
-import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.onEach
 
 @AndroidEntryPoint
 class DetailActivity : AppCompatActivity() {
