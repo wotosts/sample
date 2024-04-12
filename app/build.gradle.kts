@@ -106,7 +106,6 @@ dependencies {
     implementation(libs.room.ktx)
     implementation(libs.room.paging)
 
-    implementation(libs.orbit.core)
     implementation(libs.orbit.viewmodel)
     implementation(libs.orbit.compose)
 

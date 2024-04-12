@@ -1,21 +1,28 @@
 package dev.wotosts.sample.feature.detail
 
+import android.os.Parcelable
 import androidx.lifecycle.SavedStateHandle
+import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dev.wotosts.sample.domain.BookRepository
 import dev.wotosts.sample.domain.model.Book
-import dev.wotosts.sample.feature.base.BaseViewModel
 import kotlinx.coroutines.CoroutineExceptionHandler
-import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.parcelize.Parcelize
+import org.orbitmvi.orbit.ContainerHost
+import org.orbitmvi.orbit.syntax.simple.intent
+import org.orbitmvi.orbit.syntax.simple.postSideEffect
+import org.orbitmvi.orbit.syntax.simple.reduce
+import org.orbitmvi.orbit.viewmodel.container
 import javax.inject.Inject
 
 
+@Parcelize
 data class DetailUiState(
     val book: Book? = null,
     val isLoading: Boolean = true
-)
+) : Parcelable
 
 sealed class DetailUiEffect {
     data class OnClickedWeb(val link: String) : DetailUiEffect()
@@ -26,14 +33,20 @@ sealed class DetailUiEffect {
 @HiltViewModel
 class DetailViewModel @Inject constructor(
     private val bookRepository: BookRepository,
-    savedStateHandle: SavedStateHandle
-) :
-    BaseViewModel<DetailUiState, DetailUiEffect>(
-        DetailUiState()
-    ) {
+    savedStateHandle: SavedStateHandle,
+) : ContainerHost<DetailUiState, DetailUiEffect>,
+    ViewModel() {
+
+    override val container =
+        container<DetailUiState, DetailUiEffect>(
+            initialState = DetailUiState(),
+            savedStateHandle = savedStateHandle
+        )
 
     private val errorHandler = CoroutineExceptionHandler { context, throwable ->
-        emitEffect(DetailUiEffect.ShowErrorToast)
+        intent {
+            postSideEffect(DetailUiEffect.ShowErrorToast)
+        }
     }
 
     init {
@@ -44,22 +57,26 @@ class DetailViewModel @Inject constructor(
         if (isbn != null) {
             viewModelScope.launch(errorHandler) {
                 val book = bookRepository.getBookDetail(isbn)
-                _uiState.update { it.copy(book = book) }
+                intent { reduce { state.copy(book = book) } }
             }.invokeOnCompletion {
-                _uiState.update { it.copy(isLoading = false) }
+                intent { reduce { state.copy(isLoading = false) } }
             }
         } else {
-            emitEffect(DetailUiEffect.ShowErrorToast)
+            intent { postSideEffect(DetailUiEffect.ShowErrorToast) }
         }
     }
 
     fun onClickWeb() {
-        uiState.value.book?.url?.let {
-            emitEffect(DetailUiEffect.OnClickedWeb(it))
+        intent {
+            state.book?.url?.let {
+                postSideEffect(DetailUiEffect.OnClickedWeb(it))
+            }
         }
     }
 
     fun onClickFinish() {
-        emitEffect(DetailUiEffect.OnClickedFinish)
+        intent {
+            postSideEffect(DetailUiEffect.OnClickedFinish)
+        }
     }
 }

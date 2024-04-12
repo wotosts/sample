@@ -35,26 +35,25 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.compose.SubcomposeAsyncImage
 import dev.wotosts.sample.domain.model.Book
 import dev.wotosts.sample.feature.components.VerticalDivider
+import org.orbitmvi.orbit.compose.collectAsState
+import org.orbitmvi.orbit.compose.collectSideEffect
 
 
 @Composable
 fun DetailScreen(viewModel: DetailViewModel = hiltViewModel(), finish: () -> Unit) {
-    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val uiState by viewModel.collectAsState()
     val context = LocalContext.current
 
-    LaunchedEffect(Unit) {
-        viewModel.effect.collect { effect ->
-            when (effect) {
-                is DetailUiEffect.OnClickedFinish -> finish()
-                is DetailUiEffect.OnClickedWeb -> context.openWeb(effect.link)
-                is DetailUiEffect.ShowErrorToast -> {
-                    context.showErrorToast()
-                    finish()
-                }
+    viewModel.collectSideEffect { effect ->
+        when (effect) {
+            is DetailUiEffect.OnClickedFinish -> finish()
+            is DetailUiEffect.OnClickedWeb -> context.openWeb(effect.link)
+            is DetailUiEffect.ShowErrorToast -> {
+                context.showErrorToast()
+                finish()
             }
         }
     }

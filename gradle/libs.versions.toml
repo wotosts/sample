@@ -59,9 +59,6 @@ coil = { module = "io.coil-kt:coil-compose", version.ref = "coil" }
 
 # retrofit
 kotlin-serialization = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "kotlin-serialization" }
-orbit-compose = { module = "org.orbit-mvi:orbit-compose", version.ref = "orbit" }
-orbit-core = { module = "org.orbit-mvi:orbit-core", version.ref = "orbit" }
-orbit-viewmodel = { module = "org.orbit-mvi:orbit-viewmodel", version.ref = "orbit" }
 retrofit-core = { group = "com.squareup.retrofit2", name = "retrofit", version.ref = "retrofit" }
 retrofit-kotlin-serialization = { group = "com.jakewharton.retrofit", name = "retrofit2-kotlinx-serialization-converter", version.ref = "retrofit-kotlin-serialization-json" }
 logging-interceptor = { module = "com.squareup.okhttp3:logging-interceptor", version.ref = "logging-intercepter"}
@@ -75,6 +72,10 @@ room_ktx = { module = "androidx.room:room-ktx", version.ref = "room" }
 # paging
 paging = { module = "androidx.paging:paging-runtime", version.ref = "paging" }
 paging-compose = { group = "androidx.paging", name = "paging-compose", version.ref = "paging" }
+
+# orbit
+orbit-compose = { module = "org.orbit-mvi:orbit-compose", version.ref = "orbit" }
+orbit-viewmodel = { module = "org.orbit-mvi:orbit-viewmodel", version.ref = "orbit" }
 
 [plugins]
 daggerHiltAndroid = { id = "com.google.dagger.hilt.android", version.ref = "hilt-dagger" }
