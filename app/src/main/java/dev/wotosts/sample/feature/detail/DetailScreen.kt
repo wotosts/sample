@@ -7,7 +7,6 @@ import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
-import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -22,7 +21,6 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
@@ -35,6 +33,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.SubcomposeAsyncImage
 import dev.wotosts.sample.domain.model.Book
+import dev.wotosts.sample.feature.comm.BookScaffold
 import dev.wotosts.sample.feature.components.VerticalDivider
 import org.orbitmvi.orbit.compose.collectAsState
 import org.orbitmvi.orbit.compose.collectSideEffect
@@ -57,8 +56,7 @@ fun DetailScreen(viewModel: DetailViewModel = hiltViewModel(), finish: () -> Uni
     }
 
     DetailScreen(
-        isLoading = uiState.isLoading,
-        book = uiState.book,
+        state = uiState,
         onClickBack = viewModel::onClickFinish,
         onClickDetail = {
             viewModel.onClickWeb()
@@ -68,38 +66,38 @@ fun DetailScreen(viewModel: DetailViewModel = hiltViewModel(), finish: () -> Uni
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
 @Composable
 fun DetailScreen(
-    isLoading: Boolean,
-    book: Book?,
+    state: DetailUiState,
     onClickBack: () -> Unit,
     onClickDetail: (String) -> Unit
 ) {
-    Scaffold(topBar = {
+    BookScaffold(topBar = {
         TopAppBar(title = { }, navigationIcon = {
             IconButton(onClick = onClickBack) {
                 Icon(Icons.Default.ArrowBack, contentDescription = null)
             }
         })
     }, bottomBar = {
-        if (book != null) {
+        if (state is DetailUiState.Detail) {
             Button(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(8.dp),
-                onClick = { onClickDetail(book.url) }) {
+                onClick = { onClickDetail(state.book.url) }) {
                 Text(text = "상세 보기")
             }
         }
     }) {
-        val modifier = Modifier
-            .padding(it)
-            .consumeWindowInsets(it)
-
-        if (isLoading)
-            Box(modifier = modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+        when (state) {
+            is DetailUiState.Loading -> Box(
+                modifier = Modifier.fillMaxSize(),
+                contentAlignment = Alignment.Center
+            ) {
                 CircularProgressIndicator()
             }
-        else if (book != null) {
-            BookDetailView(modifier, book)
+
+            is DetailUiState.Detail -> {
+                BookDetailView(book = state.book)
+            }
         }
     }
 }
@@ -112,7 +110,8 @@ fun BookDetailView(modifier: Modifier = Modifier, book: Book) {
     Column(
         modifier
             .fillMaxSize()
-            .verticalScroll(scrollState)) {
+            .verticalScroll(scrollState)
+    ) {
         book.run {
             SubcomposeAsyncImage(
                 modifier = Modifier.aspectRatio(1.0f),
